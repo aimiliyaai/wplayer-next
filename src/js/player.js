@@ -459,8 +459,9 @@ class WPlayer {
         this.seek(0);
         this.play();
       }
+      // 片尾 currentTime 仍在末端，勿将 danIndex 置 0，否则会触发 frame() 一次性补绘全部历史弹幕
       if (this.danmaku) {
-        this.danmaku.danIndex = 0;
+        this.danmaku.seek();
       }
     });
 

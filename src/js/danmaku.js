@@ -26,6 +26,8 @@ class Danmaku {
       this.dan = this.options.data.sort((a, b) => a.time - b.time);
     }
 
+    this.syncReadIndexToVideoTime();
+
     window.requestAnimationFrame(() => {
       this.frame();
     });
@@ -241,15 +243,25 @@ class Danmaku {
     return this.context.measureText(text).width;
   }
 
-  seek() {
-    this.clear();
-    for (let i = 0; i < this.dan.length; i++) {
-      if (this.dan[i].time >= this.options.time()) {
-        this.danIndex = i;
+  /** 按 video.currentTime 将 danIndex 指向下一条待播弹幕，不清理 DOM（seek 会先 clear 再调） */
+  syncReadIndexToVideoTime() {
+    if (!this.dan.length) {
+      this.danIndex = 0;
+      return;
+    }
+    const t = this.options.time();
+    let i = 0;
+    for (; i < this.dan.length; i++) {
+      if (parseFloat(this.dan[i].time) >= t) {
         break;
       }
-      this.danIndex = this.dan.length;
     }
+    this.danIndex = i;
+  }
+
+  seek() {
+    this.clear();
+    this.syncReadIndexToVideoTime();
   }
 
   clear() {
