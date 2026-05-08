@@ -12,25 +12,49 @@ class Danmaku {
     };
     this.danIndex = 0;
     this.dan = [];
+    // 与初始 paused 的视频对齐；勿沿用 undefined（会被当成未暂停，易在首帧把 danIndex 扫到末尾）
+    this.paused = true;
     this.showing = true;
     this._opacity = this.options.opacity;
     this.events = this.options.events;
     this.unlimited = this.options.unlimited;
+    this._frameRafId = null;
+    this._destroyed = false;
     this._measure('');
 
     this.load();
   }
 
+  _scheduleFrame() {
+    if (this._destroyed) {
+      return;
+    }
+    if (this._frameRafId != null) {
+      cancelAnimationFrame(this._frameRafId);
+    }
+    this._frameRafId = requestAnimationFrame(() => {
+      this._frameRafId = null;
+      this.frame();
+    });
+  }
+
   load() {
-    if (this.options.data) {
-      this.dan = this.options.data.sort((a, b) => a.time - b.time);
+    if (this._destroyed) {
+      return;
+    }
+    if (this.options.data && this.options.data.length) {
+      this.dan = [...this.options.data].sort((a, b) => {
+        const ta = parseFloat(a.time);
+        const tb = parseFloat(b.time);
+        return (Number.isFinite(ta) ? ta : 0) - (Number.isFinite(tb) ? tb : 0);
+      });
+    } else if (this.options.data) {
+      this.dan = [];
     }
 
     this.syncReadIndexToVideoTime();
 
-    window.requestAnimationFrame(() => {
-      this.frame();
-    });
+    this._scheduleFrame();
 
     this.options.callback();
     this.events && this.events.trigger('danmaku_loaded');
@@ -50,8 +74,12 @@ class Danmaku {
   }
 
   send(dan, callback) {
+    if (this._destroyed) {
+      return;
+    }
+    const t = this._clock();
     const danmakuData = {
-      time: this.options.time(),
+      time: t,
       text: dan.text,
       color: dan.color,
       type: dan.type,
@@ -59,8 +87,19 @@ class Danmaku {
 
     callback(danmakuData);
 
-    this.dan.splice(this.danIndex, 0, danmakuData);
-    this.danIndex++;
+    // 按时间插入，禁止在 danIndex 直接 splice（会破坏有序性，导致后续漏播）
+    let insertAt = this.dan.length;
+    for (let k = 0; k < this.dan.length; k++) {
+      const bt = parseFloat(this.dan[k].time);
+      if (Number.isFinite(bt) && bt > t) {
+        insertAt = k;
+        break;
+      }
+    }
+    this.dan.splice(insertAt, 0, danmakuData);
+    if (insertAt <= this.danIndex) {
+      this.danIndex++;
+    }
     const danmaku = {
       text: this.htmlEncode(danmakuData.text),
       color: danmakuData.color,
@@ -72,22 +111,44 @@ class Danmaku {
     this.events && this.events.trigger('danmaku_send', danmakuData);
   }
 
+  _clock() {
+    const t = this.options.time();
+    return Number.isFinite(t) ? t : 0;
+  }
+
   frame() {
+    if (this._destroyed) {
+      return;
+    }
     if (this.dan.length && !this.paused && this.showing) {
       let item = this.dan[this.danIndex];
       const dan = [];
-      while (item && this.options.time() > parseFloat(item.time)) {
-        dan.push(item);
-        item = this.dan[++this.danIndex];
+      const clock = this._clock();
+      while (item) {
+        const itemT = parseFloat(item.time);
+        if (!Number.isFinite(itemT)) {
+          this.danIndex += 1;
+          item = this.dan[this.danIndex];
+          continue;
+        }
+        if (clock > itemT) {
+          dan.push(item);
+          item = this.dan[++this.danIndex];
+        } else {
+          break;
+        }
       }
-      this.draw(dan);
+      if (dan.length) {
+        this.draw(dan);
+      }
     }
-    window.requestAnimationFrame(() => {
-      this.frame();
-    });
+    this._scheduleFrame();
   }
 
   opacity(percentage) {
+    if (this._destroyed) {
+      return this._opacity;
+    }
     if (percentage !== undefined) {
       const items = this.container.getElementsByClassName('wplayer-danmaku-item');
       for (let i = 0; i < items.length; i++) {
@@ -109,11 +170,20 @@ class Danmaku {
    * type - danmaku type, `right` `top` `bottom`, default: `right`
    */
   draw(dan) {
+    if (this._destroyed) {
+      return;
+    }
     if (this.showing) {
+      if (Object.prototype.toString.call(dan) !== '[object Array]') {
+        dan = [dan];
+      }
+      if (!dan.length) {
+        return;
+      }
       const itemHeight = this.options.height;
       const danWidth = this.container.offsetWidth;
       const danHeight = this.container.offsetHeight;
-      const itemY = parseInt(danHeight / itemHeight);
+      const itemY = Math.max(1, parseInt(danHeight / itemHeight, 10) || 0);
 
       const danItemRight = (ele) => {
         const eleWidth = ele.offsetWidth || parseInt(ele.style.width);
@@ -156,14 +226,11 @@ class Danmaku {
         return -1;
       };
 
-      if (Object.prototype.toString.call(dan) !== '[object Array]') {
-        dan = [dan];
-      }
-
       const docFragment = document.createDocumentFragment();
 
       for (let i = 0; i < dan.length; i++) {
-        dan[i].type = typeof dan[i].type === 'number' ? utils.number2Type(dan[i].type) : dan[i].type;
+        dan[i].type =
+          typeof dan[i].type === 'number' ? utils.number2Type(dan[i].type) : dan[i].type || 'right';
         if (!dan[i].color) {
           dan[i].color = 16777215;
         }
@@ -178,7 +245,9 @@ class Danmaku {
         item.style.opacity = this._opacity;
         item.style.color = utils.number2Color(dan[i].color);
         item.addEventListener('animationend', () => {
-          this.container.removeChild(item);
+          if (item.parentNode === this.container) {
+            this.container.removeChild(item);
+          }
         });
 
         const itemWidth = this._measure(dan[i].text);
@@ -188,6 +257,12 @@ class Danmaku {
         switch (dan[i].type) {
           case 'right':
             tunnel = getTunnel(item, dan[i].type, itemWidth);
+            if (tunnel < 0 && !this.unlimited) {
+              const prevUnlimited = this.unlimited;
+              this.unlimited = true;
+              tunnel = getTunnel(item, dan[i].type, itemWidth);
+              this.unlimited = prevUnlimited;
+            }
             if (tunnel >= 0) {
               item.style.width = itemWidth + 1 + 'px';
               item.style.top = itemHeight * tunnel + 'px';
@@ -196,12 +271,24 @@ class Danmaku {
             break;
           case 'top':
             tunnel = getTunnel(item, dan[i].type);
+            if (tunnel < 0 && !this.unlimited) {
+              const prevUnlimited = this.unlimited;
+              this.unlimited = true;
+              tunnel = getTunnel(item, dan[i].type);
+              this.unlimited = prevUnlimited;
+            }
             if (tunnel >= 0) {
               item.style.top = itemHeight * tunnel + 'px';
             }
             break;
           case 'bottom':
             tunnel = getTunnel(item, dan[i].type);
+            if (tunnel < 0 && !this.unlimited) {
+              const prevUnlimited = this.unlimited;
+              this.unlimited = true;
+              tunnel = getTunnel(item, dan[i].type);
+              this.unlimited = prevUnlimited;
+            }
             if (tunnel >= 0) {
               item.style.bottom = itemHeight * tunnel + 'px';
             }
@@ -236,32 +323,40 @@ class Danmaku {
 
   _measure(text) {
     if (!this.context) {
-      const measureStyle = getComputedStyle(this.container.getElementsByClassName('wplayer-danmaku-item')[0], null);
+      const probe = this.container.getElementsByClassName('wplayer-danmaku-item')[0] || this.container;
+      const measureStyle = getComputedStyle(probe, null);
       this.context = document.createElement('canvas').getContext('2d');
       this.context.font = measureStyle.getPropertyValue('font');
     }
     return this.context.measureText(text).width;
   }
 
-  /** 按 video.currentTime 将 danIndex 指向下一条待播弹幕，不清理 DOM（seek 会先 clear 再调） */
-  syncReadIndexToVideoTime() {
+  /** 将 danIndex 指向下一条应显示的弹幕（时间轴上 first time >= 参考时刻） */
+  syncReadIndexToVideoTime(clockOverride) {
     if (!this.dan.length) {
       this.danIndex = 0;
       return;
     }
-    const t = this.options.time();
+    const t = Number.isFinite(clockOverride) ? clockOverride : this._clock();
     let i = 0;
     for (; i < this.dan.length; i++) {
-      if (parseFloat(this.dan[i].time) >= t) {
+      const it = parseFloat(this.dan[i].time);
+      if (!Number.isFinite(it)) {
+        continue;
+      }
+      if (it >= t) {
         break;
       }
     }
     this.danIndex = i;
   }
 
-  seek() {
+  /**
+   * @param {number} [clockOverride] 与 player.seek 传入的目标时刻一致（部分浏览器上赋值 currentTime 后仍未立刻更新）
+   */
+  seek(clockOverride) {
     this.clear();
-    this.syncReadIndexToVideoTime();
+    this.syncReadIndexToVideoTime(clockOverride);
   }
 
   clear() {
@@ -299,7 +394,11 @@ class Danmaku {
   show() {
     this.seek();
     this.showing = true;
-    this.play();
+    if (!this.player.video.paused) {
+      this.play();
+    } else {
+      this.pause();
+    }
 
     this.events && this.events.trigger('danmaku_show');
   }
@@ -310,6 +409,14 @@ class Danmaku {
 
   speed(rate) {
     this.options.speedRate = rate;
+  }
+
+  destroy() {
+    this._destroyed = true;
+    if (this._frameRafId != null) {
+      cancelAnimationFrame(this._frameRafId);
+      this._frameRafId = null;
+    }
   }
 
   _danAnimation(position) {

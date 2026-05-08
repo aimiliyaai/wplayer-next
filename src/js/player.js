@@ -163,7 +163,7 @@ class WPlayer {
     this.video.currentTime = time;
 
     if (this.danmaku) {
-      this.danmaku.seek();
+      this.danmaku.seek(time);
     }
 
     this.bar.set('played', time / this.video.duration, 'width');
@@ -283,7 +283,7 @@ class WPlayer {
     this.video.poster = video.pic ? video.pic : '';
     this.video.src = video.url;
     this.initMSE(this.video, video.type || 'auto');
-    if (danmaku) {
+    if (this.options.danmaku) {
       this.template.danmakuLoading.style.display = 'block';
       this.bar.set('played', 0, 'width');
       this.bar.set('loaded', 0, 'width');
@@ -453,15 +453,17 @@ class WPlayer {
     // video end
     this.on('ended', () => {
       this.bar.set('played', 1, 'width');
-      if (!this.setting.loop) {
+      const loopEnabled = this.setting ? this.setting.loop : this.options.loop;
+      if (!loopEnabled) {
         this.pause();
+        // 片尾：按实际游标对齐（currentTime 在末端）
+        if (this.danmaku) {
+          this.danmaku.seek();
+        }
       } else {
         this.seek(0);
         this.play();
-      }
-      // 片尾 currentTime 仍在末端，勿将 danIndex 置 0，否则会触发 frame() 一次性补绘全部历史弹幕
-      if (this.danmaku) {
-        this.danmaku.seek();
+        // seek(0) 已调用 danmaku.seek(0)；勿再无参 seek，否则部分环境 currentTime 尚未为 0 会把读指错位
       }
     });
 
@@ -484,6 +486,13 @@ class WPlayer {
       const currentTime = utils.secondToTime(this.video.currentTime);
       if (this.template.ptime.innerHTML !== currentTime) {
         this.template.ptime.innerHTML = currentTime;
+      }
+    });
+
+    /** 走 DOM 或脚本直接改 currentTime 时同步弹幕游标（仅靠 player.seek 会漏） */
+    this.on('seeked', () => {
+      if (this.danmaku) {
+        this.danmaku.seek();
       }
     });
 
@@ -628,6 +637,9 @@ class WPlayer {
     this.contextmenu.destroy();
     this.controller.destroy();
     this.timer.destroy();
+    if (this.danmaku) {
+      this.danmaku.destroy();
+    }
     this.video.src = '';
     this.container.innerHTML = '';
     this.events.trigger('destroy');
