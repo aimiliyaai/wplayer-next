@@ -23,6 +23,10 @@ class Template {
         pic: this.options.video.pic,
         preload: this.options.preload,
         url: this.options.video.url,
+        crossOrigin:
+          this.options.video.crossOrigin === false
+            ? ''
+            : this.options.video.crossOrigin || 'anonymous',
       },
     });
 
@@ -74,6 +78,14 @@ class Template {
     this.menuItem = this.container.querySelectorAll('.wplayer-menu-item');
     this.qualityButton = this.container.querySelector('.wplayer-quality-icon');
     this.qualityList = this.container.querySelector('.wplayer-quality-list');
+    this.subtitleSettingEntry = this.container.querySelector('.wplayer-setting-subtitles-entry');
+    this.subtitleSettingLabel = this.container.querySelector('.wplayer-setting-subtitles-entry-label');
+    this.subtitleSettingValue = this.container.querySelector('.wplayer-setting-subtitles-entry-value');
+    this.subtitleSettingPanel = this.container.querySelector('.wplayer-setting-subtitles-panel');
+    this.subtitleSettingBack = this.container.querySelector('.wplayer-setting-subtitles-back');
+    this.subtitleSettingList = this.container.querySelector('.wplayer-setting-subtitles-list');
+    this.subtitleQuickWrap = this.container.querySelector('.wplayer-subtitles-quick');
+    this.subtitleQuickButton = this.container.querySelector('.wplayer-subtitles-quick-icon');
     this.subtrack = this.container.querySelector('.wplayer-subtrack');
     this.barPreview = this.container.querySelector('.wplayer-bar-preview');
     this.barWrap = this.container.querySelector('.wplayer-bar-wrap');

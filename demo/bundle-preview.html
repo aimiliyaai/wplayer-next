@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WPlayer 打包产物预览</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #1a1a1a;
+      color: #e8e8e8;
+    }
+
+    h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+
+    p {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #b0b0b0;
+    }
+
+    #player-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      height: 480px;
+      background: #000;
+    }
+
+    code {
+      background: #2a2a2a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+  </style>
+  <!-- 从仓库根目录用 HTTP 静态服务启动后，脚本路径指向 dist 压缩包 -->
+  <script src="/dist/WPlayer.min.js"></script>
+</head>
+
+<body>
+  <h1>打包预览（dist/WPlayer.min.js）</h1>
+  <p>
+    1）先在项目根执行 <code>npm run build</code>；2）在项目根<strong>上一级不要错</strong>启动静态服务器，例如
+    <code>npx serve -l 8787 .</code>；3）浏览器打开
+    <code>http://localhost:8787/demo/bundle-preview.html</code>。<br />
+    字幕：<code>/demo/sample.vtt</code>。<strong>不可用 file://。</strong>
+  </p>
+  <div id="player-wrap"></div>
+  <script>
+    /* global WPlayer */
+    var dp = new WPlayer({
+      container: document.getElementById('player-wrap'),
+      lang: 'zh-cn',
+      autoplay: false,
+      video: {
+        url: 'https://api.dogecloud.com/player/get.mp4?vcode=5ac682e6f8231991&userId=17&ext=.mp4',
+        pic: 'https://i.loli.net/2019/06/06/5cf8c5d9c57b510947.png',
+        subtitles: [
+          {
+            src: '/demo/sample.vtt',
+            label: '测试字幕',
+            srclang: 'zh',
+            default: true,
+          },
+        ],
+      },
+    });
+  </script>
+</body>
+
+</html>

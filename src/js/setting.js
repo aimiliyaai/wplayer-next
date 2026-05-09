@@ -93,11 +93,15 @@ class Setting {
   }
 
   hide() {
+    if (this.player.subtitle && this.player.subtitle.onSettingsHide) {
+      this.player.subtitle.onSettingsHide();
+    }
     this.player.template.settingBox.classList.remove('wplayer-setting-box-open');
     this.player.template.mask.classList.remove('wplayer-mask-show');
     setTimeout(() => {
       this.player.template.settingBox.classList.remove('wplayer-setting-box-narrow');
       this.player.template.settingBox.classList.remove('wplayer-setting-box-speed');
+      this.player.template.settingBox.classList.remove('wplayer-setting-box-subtitles-menu');
     }, 300);
 
     this.player.controller.disableAutoHide = false;

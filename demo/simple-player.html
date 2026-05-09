@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WPlayer 简单演示（含字幕）</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #1a1a1a;
+      color: #e8e8e8;
+    }
+
+    h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+
+    p {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #b0b0b0;
+    }
+
+    #player-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      height: 480px;
+      background: #000;
+    }
+
+    code {
+      background: #2a2a2a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+  </style>
+  <!-- 与 demo/index.html 相同：请先执行 npm run dev，再通过开发服务器打开本页（例如 /simple-player.html），以加载内存中的 WPlayer.js -->
+  <script src="WPlayer.js"></script>
+</head>
+
+<body>
+  <h1>WPlayer 简单演示</h1>
+  <p>
+    在项目根目录执行 <code>npm run dev</code>，浏览器打开开发服务器地址下的
+    <code>simple-player.html</code>。点击<strong>倍速与齿轮之间的字幕图标</strong>可快速开关默认字幕轨；进入<strong>齿轮 → 字幕</strong>可切换语言。字幕文件为同目录 <code>sample.vtt</code>（需 HTTP 同源，不要用 <code>file://</code> 直接打开）。
+  </p>
+  <div id="player-wrap"></div>
+  <script>
+    /* global WPlayer */
+    var dp = new WPlayer({
+      container: document.getElementById('player-wrap'),
+      lang: 'zh-cn',
+      autoplay: false,
+      video: {
+        url: 'https://api.dogecloud.com/player/get.mp4?vcode=5ac682e6f8231991&userId=17&ext=.mp4',
+        pic: 'https://i.loli.net/2019/06/06/5cf8c5d9c57b510947.png',
+        subtitles: [
+          {
+            src: 'sample.vtt',
+            label: '测试字幕',
+            srclang: 'zh',
+            default: true,
+          },
+        ],
+      },
+    });
+
+    dp.on('subtitle_change', function (detail) {
+      console.log('[subtitle_change]', detail);
+    });
+    dp.on('subtitle_show', function () {
+      console.log('[subtitle_show]');
+    });
+    dp.on('subtitle_hide', function () {
+      console.log('[subtitle_hide]');
+    });
+  </script>
+</body>
+
+</html>

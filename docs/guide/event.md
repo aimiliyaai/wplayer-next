@@ -57,4 +57,4 @@ player.on('ended', function () {
 - fullscreen_cancel
 - subtitle_show
 - subtitle_hide
-- subtitle_change
+- subtitle_change（参数含 `visible`、`trackIndex`，开启时可有 `label`，见[字幕文档 · 事件](/guide/subtitles#events)）

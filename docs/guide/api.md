@@ -45,6 +45,14 @@ player.volume(0.1, true, false);
 
 - `player.video`: 原生 video
 
+- `player.updateSubtitles(config: Array | Object)`: 运行时更新字幕轨道（WebVTT），不销毁播放器。详见[字幕文档 · 运行时 API](/guide/subtitles#runtime-api)
+
+```js
+player.updateSubtitles([
+  { src: '/subs/zh.vtt', label: '中文', srclang: 'zh', default: true },
+]);
+```
+
 - `player.video.currentTime`: 返回视频当前播放时间
 
 - `player.video.duration`: 返回视频总时间

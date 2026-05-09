@@ -475,6 +475,10 @@
         font-weight: 400;
       }
 
+      &.wplayer-subtitles-quick-icon {
+        padding-top: 8px;
+      }
+
       // &.wplayer-volume-icon {}
     }
 
@@ -512,6 +516,18 @@
           width: 70px;
           text-align: center;
         }
+
+        &.wplayer-setting-box-subtitles-menu {
+          width: 246px;
+
+          & > .wplayer-setting-origin-panel {
+            display: none !important;
+          }
+
+          & > .wplayer-setting-subtitles-panel {
+            display: block;
+          }
+        }
       }
 
       .wplayer-setting-item {
@@ -523,6 +539,153 @@
 
         &:hover {
           background-color: rgba(255, 255, 255, .1);
+        }
+      }
+
+      .wplayer-setting-subtitles-panel {
+        display: none;
+        padding: 0 0 4px;
+
+        .wplayer-setting-subtitles-header {
+          display: flex;
+          align-items: center;
+          height: 34px;
+          padding: 0 2px;
+          border-bottom: 1px solid rgba(255, 255, 255, .08);
+          margin-bottom: 2px;
+        }
+
+        .wplayer-setting-subtitles-back {
+          flex: 0 0 32px;
+          width: 32px;
+          height: 32px;
+          border: none;
+          background: transparent;
+          color: #fff;
+          font-size: 22px;
+          line-height: 1;
+          cursor: pointer;
+          border-radius: 2px;
+          padding: 0;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, .1);
+          }
+        }
+
+        .wplayer-setting-subtitles-title {
+          flex: 1;
+          text-align: center;
+          font-size: 13px;
+          color: #eee;
+          padding-right: 32px;
+        }
+
+        .wplayer-setting-subtitles-list {
+          max-height: 220px;
+          overflow-y: auto;
+        }
+
+        .wplayer-setting-subtitles-option {
+          display: flex;
+          align-items: center;
+          min-height: 32px;
+          padding: 6px 10px 6px 8px;
+          box-sizing: border-box;
+          cursor: pointer;
+          font-size: 13px;
+          color: #eee;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, .1);
+          }
+
+          .wplayer-setting-subtitles-check {
+            flex: 0 0 18px;
+            width: 18px;
+            opacity: 0;
+            font-size: 12px;
+          }
+
+          &.wplayer-setting-subtitles-option-active .wplayer-setting-subtitles-check {
+            opacity: 1;
+          }
+
+          .wplayer-label {
+            flex: 1;
+            line-height: 1.35;
+          }
+        }
+      }
+
+      .wplayer-setting-subtitles-entry {
+        display: flex !important;
+        align-items: center;
+        height: auto !important;
+        min-height: 30px;
+        padding: 6px 10px !important;
+        gap: 6px;
+
+        .wplayer-setting-subtitles-entry-icon {
+          flex: 0 0 22px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          path,
+          circle {
+            fill: #fff;
+          }
+
+          .wplayer-icon-content svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+            vertical-align: middle;
+          }
+        }
+
+        .wplayer-setting-subtitles-entry-label {
+          flex: 1;
+          font-size: 13px;
+          color: #fff;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .wplayer-setting-subtitles-entry-right {
+          flex: 0 0 auto;
+          display: flex;
+          align-items: center;
+          gap: 2px;
+          max-width: 55%;
+          font-size: 12px;
+          color: rgba(255, 255, 255, .72);
+        }
+
+        .wplayer-setting-subtitles-entry-value {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 96px;
+        }
+
+        .wplayer-setting-subtitles-entry-chevron {
+          flex-shrink: 0;
+          opacity: .88;
+          font-size: 18px;
+          line-height: 1;
+        }
+
+        &.wplayer-subtitles-setting-disabled {
+          cursor: default;
+          opacity: 0.45;
+
+          .wplayer-setting-subtitles-entry-chevron {
+            opacity: 0.35;
+          }
         }
       }
     }
@@ -579,6 +742,57 @@
             }
           }
         }
+      }
+    }
+
+    .wplayer-subtitles-quick {
+      position: relative;
+      display: inline-block;
+      height: 100%;
+      vertical-align: top;
+      z-index: 2;
+
+      .wplayer-subtitles-quick-icon {
+        position: relative;
+      }
+
+      .wplayer-subtitles-quick-svg-off.wplayer-icon-content,
+      .wplayer-subtitles-quick-svg-on.wplayer-icon-content {
+        svg {
+          width: 23px;
+          height: 23px;
+          display: block;
+          vertical-align: middle;
+        }
+      }
+
+      .wplayer-subtitles-quick-svg-on.wplayer-icon-content {
+        display: none;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+
+      &.wplayer-subtitles-quick-on:not(.wplayer-subtitles-quick-disabled) {
+        .wplayer-subtitles-quick-svg-off.wplayer-icon-content {
+          visibility: hidden;
+        }
+
+        .wplayer-subtitles-quick-svg-on.wplayer-icon-content {
+          display: block;
+        }
+      }
+
+      &.wplayer-subtitles-quick-on .wplayer-icon-content {
+        opacity: 1;
+      }
+
+      &.wplayer-subtitles-quick-disabled {
+        opacity: 0.48;
+        pointer-events: none;
+        cursor: not-allowed;
       }
     }
 

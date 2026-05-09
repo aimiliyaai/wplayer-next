@@ -20,6 +20,8 @@
 | video.defaultQuality | -                                  | 见[#清晰度切换](/guide/quality#清晰度切换)                                                                       |
 | video.url            | -                                  | 视频链接                                                                                                         |
 | video.pic            | -                                  | 视频封面                                                                                                         |
+| video.subtitles      | -                                  | 外挂字幕轨列表（WebVTT），见[字幕文档](/guide/subtitles#subtitles)                              |
+| video.subtitle       | -                                  | 单条字幕简写，见[字幕文档 · 初始化参数](/guide/subtitles#init-config)                                                     |
 | video.type           | 'auto'                             | 可选值: 'auto', 'hls', 'flv', 'dash', 'webtorrent', 'normal' 或其他自定义类型, 见[#MSE 支持](/guide/mse#MSE支持) |
 | video.customType     | -                                  | 自定义类型, 见[#MSE 支持](/guide/mse#MSE支持)                                                                    |
 | danmaku              | -                                  | 显示弹幕                                                                                                         |

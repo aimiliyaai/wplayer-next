@@ -10,6 +10,8 @@ import commentOff from '../assets/comment-off.svg';
 import send from '../assets/send.svg';
 import pallette from '../assets/pallette.svg';
 import loading from '../assets/loading.svg';
+import subtitles from '../assets/subtitles.svg';
+import subtitlesOn from '../assets/subtitles-on.svg';
 const Icons = {
   play: play,
   pause: pause,
@@ -23,6 +25,8 @@ const Icons = {
   send: send,
   pallette: pallette,
   loading: loading,
+  subtitles: subtitles,
+  subtitlesOn: subtitlesOn,
 };
 
 export default Icons;

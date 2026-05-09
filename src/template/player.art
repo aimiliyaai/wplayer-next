@@ -134,6 +134,12 @@
         </span>
       </button>
     </div>
+    <div class="wplayer-subtitles-quick wplayer-subtitles-quick-disabled">
+      <button type="button" class="wplayer-icon wplayer-subtitles-quick-icon" data-balloon="{{ tran('subtitles') }}" data-balloon-pos="up" aria-pressed="false" aria-label="{{ tran('subtitles') }}">
+        <span class="wplayer-icon-content wplayer-subtitles-quick-svg-off">{{@ icons.subtitles }}</span>
+        <span class="wplayer-icon-content wplayer-subtitles-quick-svg-on">{{@ icons.subtitlesOn }}</span>
+      </button>
+    </div>
     {{ if options.setting }}
     <div class="wplayer-setting">
       <button class="wplayer-icon wplayer-setting-icon" data-balloon="{{ tran('setting') }}" data-balloon-pos="up">
@@ -162,6 +168,21 @@
               <label for="wplayer-toggle-danunlimit"></label>
             </div>
           </div>
+          <div class="wplayer-setting-item wplayer-setting-subtitles-entry wplayer-subtitles-setting-disabled" role="button" tabindex="-1">
+            <span class="wplayer-setting-subtitles-entry-icon" aria-hidden="true"><span class="wplayer-icon-content">{{@ icons.subtitles }}</span></span>
+            <span class="wplayer-setting-subtitles-entry-label"></span>
+            <span class="wplayer-setting-subtitles-entry-right">
+              <span class="wplayer-setting-subtitles-entry-value"></span>
+              <span class="wplayer-setting-subtitles-entry-chevron" aria-hidden="true">›</span>
+            </span>
+          </div>
+        </div>
+        <div class="wplayer-setting-subtitles-panel">
+          <div class="wplayer-setting-subtitles-header">
+            <button type="button" class="wplayer-setting-subtitles-back" aria-label="{{ tran('subtitle-back') }}">‹</button>
+            <span class="wplayer-setting-subtitles-title">{{ tran('subtitles') }}</span>
+          </div>
+          <div class="wplayer-setting-subtitles-list"></div>
         </div>
       </div>
     </div>

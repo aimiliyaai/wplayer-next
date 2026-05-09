@@ -29,6 +29,20 @@
     display: block;
   }
 
+  video.wplayer-video-current::cue {
+    background-color: rgba(0, 0, 0, 0.72);
+    color: #fff;
+    /* 中英文混排阅读舒适 */
+    font-size: 110%;
+    font-weight: 600;
+    font-family: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'PingFang TC',
+      'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+    text-shadow:
+      0 0 2px rgba(0, 0, 0, 0.92),
+      0 2px 4px rgba(0, 0, 0, 0.75);
+    line-height: 1.4;
+  }
+
   .wplayer-video-prepare {
     display: none;
   }

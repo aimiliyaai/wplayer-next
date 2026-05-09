@@ -59,6 +59,9 @@ const standard = {
   off: 'Off',
   volume: 'Volume',
   live: 'Live',
+  subtitles: 'Subtitles',
+  'subtitle-back': 'Back',
+  'subtitle-unavailable': 'Unavailable',
   'video-info': 'Video info',
 };
 
@@ -98,6 +101,9 @@ const tranTxt = {
     off: '关闭',
     volume: '音量',
     live: '直播',
+    subtitles: '字幕',
+    'subtitle-back': '返回',
+    'subtitle-unavailable': '不可用',
     'video-info': '视频统计信息',
   },
   'zh-tw': {
@@ -133,6 +139,9 @@ const tranTxt = {
     off: '關閉',
     volume: '音量',
     live: '直播',
+    subtitles: '字幕',
+    'subtitle-back': '返回',
+    'subtitle-unavailable': '無法使用',
     'video-info': '影片統計訊息',
   },
   'ko-kr': {
@@ -170,6 +179,9 @@ const tranTxt = {
     off: '끄다',
     Volume: '볼륨',
     live: '생방송',
+    subtitles: '자막',
+    'subtitle-back': '뒤로',
+    'subtitle-unavailable': '사용 불가',
     'video-info': '비디오 정보',
   },
   de: {
@@ -205,6 +217,9 @@ const tranTxt = {
     off: 'Schließung',
     volume: 'Lautstärke',
     live: 'Live',
+    subtitles: 'Untertitel',
+    'subtitle-back': 'Zurück',
+    'subtitle-unavailable': 'Nicht verfügbar',
     'video-info': 'Video Info',
   },
   "ja": {
@@ -241,6 +256,9 @@ const tranTxt = {
     off: 'OFF',
     volume: '音量',
     live: 'ライブ',
+    subtitles: '字幕',
+    'subtitle-back': '戻る',
+    'subtitle-unavailable': '利用不可',
     'video-info': '動画情報'
   },
   'ru': {
@@ -276,6 +294,9 @@ const tranTxt = {
     off: 'Выкл',
     volume: 'Громкость',
     live: 'Живые комментарии',
+    subtitles: 'Субтитры',
+    'subtitle-back': 'Назад',
+    'subtitle-unavailable': 'Недоступно',
     'video-info': 'Информация о видео',
   },
 };

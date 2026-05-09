@@ -18,6 +18,7 @@ import Comment from './comment';
 import HotKey from './hotkey';
 import ContextMenu from './contextmenu';
 import InfoPanel from './info-panel';
+import Subtitle from './subtitle';
 import tplVideo from '../template/video.art';
 
 let index = 0;
@@ -76,6 +77,8 @@ class WPlayer {
     this.fullScreen = new FullScreen(this);
 
     this.controller = new Controller(this);
+
+    this.subtitle = new Subtitle(this);
 
     if (this.options.danmaku) {
       this.danmaku = new Danmaku({
@@ -512,6 +515,10 @@ class WPlayer {
       });
     }
 
+    if (this.subtitle) {
+      this.subtitle.setup(video);
+    }
+
     this.volume(this.user.get('volume'), true, true);
   }
 
@@ -532,11 +539,16 @@ class WPlayer {
 
     const paused = this.video.paused;
     this.video.pause();
+    const vo = this.options.video;
     const videoHTML = tplVideo({
       current: false,
       pic: null,
       preload: 'auto',
       url: this.quality.url,
+      crossOrigin:
+        vo && vo.crossOrigin === false
+          ? ''
+          : (vo && vo.crossOrigin) || 'anonymous',
     });
     const videoEle = new DOMParser().parseFromString(videoHTML, 'text/html').body.firstChild;
     this.template.videoWrap.insertBefore(videoEle, this.template.videoWrap.getElementsByTagName('div')[0]);
@@ -631,6 +643,16 @@ class WPlayer {
     }
 
     this.events.trigger('resize');
+  }
+
+  /**
+   * 更新字幕列表并重新挂载 <track>（WebVTT 等）
+   * @param {Array|Object} config - subtitles 数组或单个 { src, label?, srclang?, default?, kind? }
+   */
+  updateSubtitles(config) {
+    if (this.subtitle) {
+      this.subtitle.updateSubtitleConfig(config);
+    }
   }
 
   speed(rate) {

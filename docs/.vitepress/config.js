@@ -58,6 +58,10 @@ export default {
               link: '/guide/event'
             },
             {
+              text: '字幕（WebVTT）',
+              link: '/guide/subtitles'
+            },
+            {
               text: '清晰度切换',
               link: '/guide/quality'
             },
