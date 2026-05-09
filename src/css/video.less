@@ -30,17 +30,12 @@
   }
 
   video.wplayer-video-current::cue {
-    background-color: rgba(0, 0, 0, 0.72);
-    color: #fff;
-    /* 中英文混排阅读舒适 */
-    font-size: 110%;
-    font-weight: 600;
-    font-family: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'PingFang TC',
-      'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
-    text-shadow:
-      0 0 2px rgba(0, 0, 0, 0.92),
-      0 2px 4px rgba(0, 0, 0, 0.75);
-    line-height: 1.4;
+    background-color: var(--wplayer-subtitle-bg, rgba(0, 0, 0, 0.72));
+    color: var(--wplayer-subtitle-color, #fff);
+    font-size: var(--wplayer-subtitle-font-size, 95%);
+    font-weight: var(--wplayer-subtitle-font-weight, 600);
+    font-family: var(--wplayer-subtitle-font-family, system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'PingFang TC', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif);
+    text-shadow: var(--wplayer-subtitle-text-shadow, 0 0 3px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.75), 1px 0 1px rgba(0, 0, 0, 0.8), -1px 0 1px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(0, 0, 0, 0.8), 0 -1px 1px rgba(0, 0, 0, 0.8));
   }
 
   .wplayer-video-prepare {

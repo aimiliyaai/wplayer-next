@@ -4,11 +4,30 @@
 
 /** Keep in sync with web-client `subtitle-preference.ts` ALNITAK_SUBTITLE_PREF_LS_KEY */
 const ALNITAK_SUBTITLE_PREF_KEY = 'alnitak-pref-subtitle-track';
+const ALNITAK_SUBTITLE_BG_KEY = 'alnitak-pref-subtitle-bg';
 
 function subtitlePrefNorm(s) {
   return String(s || '')
     .trim()
     .toLowerCase();
+}
+
+function readSubtitleBgPreference() {
+  try {
+    if (typeof localStorage === 'undefined') return true;
+    var raw = localStorage.getItem(ALNITAK_SUBTITLE_BG_KEY);
+    return raw === null ? true : raw === '1';
+  } catch (_) {
+    return true;
+  }
+}
+
+function persistSubtitleBgPreference(val) {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(ALNITAK_SUBTITLE_BG_KEY, val ? '1' : '0');
+    }
+  } catch (_) {}
 }
 
 function readSubtitlePreference() {
@@ -85,6 +104,10 @@ class Subtitle {
 
     this.hasMenuUi = !!(this.settingEntry && this.subtitleLabelEl && this.subtitleValueEl && this.subtitlesPanel && this.subtitlesBack && this.subtitlesList);
 
+    /** 字幕背景开关 */
+    this.subtitleBgEnabled = readSubtitleBgPreference();
+    this.syncSubtitleBg();
+
     if (this.quickButton) {
       this.quickButton.addEventListener('click', (e) => {
         e.preventDefault();
@@ -108,9 +131,17 @@ class Subtitle {
       });
 
       this.subtitlesList.addEventListener('click', (e) => {
-        const opt = e.target.closest('.wplayer-setting-subtitles-option');
+        const opt = e.target.closest('[data-track-index], [data-subtitle-bg]');
         if (!opt || !this.available) return;
         e.stopPropagation();
+        if (opt.hasAttribute('data-subtitle-bg')) {
+          this.subtitleBgEnabled = !this.subtitleBgEnabled;
+          persistSubtitleBgPreference(this.subtitleBgEnabled);
+          this.syncSubtitleBg();
+          this.rebuildSubtitleList();
+          this.syncListActive();
+          return;
+        }
         const raw = opt.getAttribute('data-track-index');
         const idx = raw === '-1' || raw === null ? -1 : Number.parseInt(raw, 10);
         this.selectedTrackIndex = Number.isNaN(idx) ? -1 : idx;
@@ -160,6 +191,12 @@ class Subtitle {
     this.quickWrap.classList.toggle('wplayer-subtitles-quick-disabled', dis);
     this.quickWrap.classList.toggle('wplayer-subtitles-quick-on', on);
     this.quickButton.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+
+  syncSubtitleBg() {
+    if (!this.player.video) return;
+    this.player.video.style.setProperty('--wplayer-subtitle-bg',
+      this.subtitleBgEnabled ? 'rgba(0, 0, 0, 0.72)' : 'transparent');
   }
 
   onSettingsHide() {
@@ -266,6 +303,27 @@ class Subtitle {
     for (let i = 0; i < tracks.length; i++) {
       mk(i, this.trackDisplayLabel(tracks[i], i));
     }
+
+    const bgDiv = document.createElement('div');
+    bgDiv.className = 'wplayer-setting-subtitles-bg-item';
+    bgDiv.setAttribute('data-subtitle-bg', '1');
+    const bgLab = document.createElement('span');
+    bgLab.className = 'wplayer-label';
+    bgLab.textContent = this.player.tran('subtitle-bg') || '字幕背景';
+    const toggleDiv = document.createElement('div');
+    toggleDiv.className = 'wplayer-toggle';
+    const toggleId = 'wplayer-subtitle-bg-' + (this.player.index || 0);
+    const toggleInput = document.createElement('input');
+    toggleInput.type = 'checkbox';
+    toggleInput.id = toggleId;
+    toggleInput.checked = this.subtitleBgEnabled;
+    const toggleLabel = document.createElement('label');
+    toggleLabel.setAttribute('for', toggleId);
+    toggleDiv.appendChild(toggleInput);
+    toggleDiv.appendChild(toggleLabel);
+    bgDiv.appendChild(bgLab);
+    bgDiv.appendChild(toggleDiv);
+    this.subtitlesList.appendChild(bgDiv);
   }
 
   syncListActive() {
@@ -276,6 +334,10 @@ class Subtitle {
       const idx = raw === '-1' || raw === null ? -1 : Number.parseInt(raw, 10);
       row.classList.toggle('wplayer-setting-subtitles-option-active', idx === this.selectedTrackIndex);
     });
+    const bgItem = this.subtitlesList.querySelector('[data-subtitle-bg] input[type="checkbox"]');
+    if (bgItem) {
+      bgItem.checked = this.subtitleBgEnabled;
+    }
   }
 
   applySubtitleState() {
@@ -396,6 +458,7 @@ class Subtitle {
     var selectedIdx = pickPreferredSubtitleTrackIndex(this.collectSubtitleTracks(video));
     this.selectedTrackIndex = Math.min(Math.max(0, selectedIdx), list.length - 1);
     this.setAvailable(true);
+    this.syncSubtitleBg();
     this.applySubtitleState();
     this.refreshSubsUi();
 
@@ -414,17 +477,9 @@ class Subtitle {
         return ct.mode !== 'disabled';
       });
       if (needsReapply) {
-        console.warn('[Alnitak:subtitle:debug] MODE_REAPPLY', {
-          sid: sid, protectIdx: protectIdx,
-          tracks: JSON.stringify(cur.map(function (ct, ci) { return { i: ci, label: ct.label, lang: ct.language, mode: ct.mode }; })),
-        });
         cur.forEach(function (ct) { ct.mode = 'disabled'; });
         requestAnimationFrame(function () {
           if (cur[protectIdx]) cur[protectIdx].mode = 'showing';
-          console.warn('[Alnitak:subtitle:debug] MODE_REAPPLY:after', {
-            sid: sid, protectIdx: protectIdx,
-            tracks: JSON.stringify(self.collectSubtitleTracks(video).map(function (ct, ci) { return { i: ci, label: ct.label, lang: ct.language, mode: ct.mode }; })),
-          });
         });
       }
       setTimeout(protectModes, 200);

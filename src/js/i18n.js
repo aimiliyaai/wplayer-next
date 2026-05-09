@@ -62,6 +62,7 @@ const standard = {
   subtitles: 'Subtitles',
   'subtitle-back': 'Back',
   'subtitle-unavailable': 'Unavailable',
+  'subtitle-bg': 'Subtitle background',
   'video-info': 'Video info',
 };
 
@@ -104,6 +105,7 @@ const tranTxt = {
     subtitles: '字幕',
     'subtitle-back': '返回',
     'subtitle-unavailable': '不可用',
+    'subtitle-bg': '字幕背景',
     'video-info': '视频统计信息',
   },
   'zh-tw': {
