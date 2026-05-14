@@ -70,6 +70,10 @@ class WPlayer {
 
     this.video = this.template.video;
 
+    if (this.options.autoplay) {
+      this.video.autoplay = true;
+    }
+
     this.bar = new Bar(this.template);
 
     this.bezel = new Bezel(this.template.bezel);
@@ -187,11 +191,11 @@ class WPlayer {
 
     if (!fromNative) {
       const playedPromise = Promise.resolve(this.video.play());
-      playedPromise
-        .catch(() => {
+      playedPromise.catch((error) => {
+        if (error.name !== 'AbortError' && error.name !== 'NotAllowedError') {
           this.pause();
-        })
-        .then(() => { });
+        }
+      });
     }
     this.timer.enable('loading');
     this.container.classList.remove('wplayer-paused');
