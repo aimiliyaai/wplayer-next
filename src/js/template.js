@@ -50,6 +50,8 @@ class Template {
     this.settingButton = this.container.querySelector('.wplayer-setting-icon');
     this.settingBox = this.container.querySelector('.wplayer-setting-box');
     this.mask = this.container.querySelector('.wplayer-mask');
+    this.autoplay = this.container.querySelector('.wplayer-setting-autoplay');
+    this.autoplayToggle = this.container.querySelector('.wplayer-setting-autoplay .wplayer-autoplay-toggle-input');
     this.loop = this.container.querySelector('.wplayer-setting-loop');
     this.loopToggle = this.container.querySelector('.wplayer-setting-loop .wplayer-toggle-setting-input');
     this.showDanmaku = this.container.querySelector('.wplayer-setting-showdan');

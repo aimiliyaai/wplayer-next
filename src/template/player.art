@@ -147,6 +147,13 @@
       </button>
       <div class="wplayer-setting-box">
         <div class="wplayer-setting-origin-panel">
+          <div class="wplayer-setting-item wplayer-setting-autoplay">
+            <span class="wplayer-label">{{ tran('autoplay') }}</span>
+            <div class="wplayer-toggle">
+              <input class="wplayer-autoplay-toggle-input" type="checkbox" name="wplayer-autoplay-toggle" id="wplayer-autoplay-toggle">
+              <label for="wplayer-autoplay-toggle"></label>
+            </div>
+          </div>
           <div class="wplayer-setting-item wplayer-setting-loop">
             <span class="wplayer-label">{{ tran('loop') }}</span>
             <div class="wplayer-toggle">

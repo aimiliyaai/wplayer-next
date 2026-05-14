@@ -11,6 +11,19 @@ class Setting {
       this.show();
     });
 
+    // autoplay (default: enabled)
+    const storedAutoplay = utils.storage.get('wplayer-autoplay');
+    this.autoplay = storedAutoplay === null ? true : storedAutoplay === '1';
+    this.player.template.autoplayToggle.checked = this.autoplay;
+    this.player.template.autoplay.addEventListener('click', () => {
+      this.player.template.autoplayToggle.checked = !this.player.template.autoplayToggle.checked;
+      this.autoplay = this.player.template.autoplayToggle.checked;
+      utils.storage.set('wplayer-autoplay', this.autoplay ? '1' : '0');
+      if (this.autoplay && this.player.video.paused) {
+        this.player.play();
+      }
+    });
+
     // loop
     this.loop = this.player.options.loop;
     this.player.template.loopToggle.checked = this.loop;
