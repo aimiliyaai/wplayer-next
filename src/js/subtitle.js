@@ -113,7 +113,6 @@ class Subtitle {
         e.preventDefault();
         e.stopPropagation();
         this.quickToggle();
-        this.quickButton.blur();
       });
     }
 
